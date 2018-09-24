@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import cz.fi.muni.carshop.CarShopStorage;
 import cz.fi.muni.carshop.entities.Car;
 import cz.fi.muni.carshop.enums.CarTypes;
+import cz.fi.muni.carshop.exceptions.RequestedCarNotFoundException;
 
 public class CarShopStorageServiceImpl implements CarShopStorageService {
 
@@ -26,6 +27,11 @@ public class CarShopStorageServiceImpl implements CarShopStorageService {
 		List<Car> carsOfSameType = allCars.get(referenceCar.getType());
 		return carsOfSameType.stream().filter(car -> referenceCar.getConstructionYear() == car.getConstructionYear()
 				&& car.getPrice() < referenceCar.getPrice()).collect(Collectors.toList());
+	}
+
+	@Override
+	public void sellCar(Car car) throws RequestedCarNotFoundException {
+
 	}
 
 	@Override
