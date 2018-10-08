@@ -36,7 +36,7 @@ public class CurrencyConvertorImplTest {
     @Test
     public void testConvertWithNullSourceCurrency() throws IllegalArgumentException,ExternalServiceFailureException{
 
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source currency in arguments");
+       // IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source currency in arguments");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> currencyConvertor.convert(null, INR, BigDecimal.ONE))
@@ -46,7 +46,7 @@ public class CurrencyConvertorImplTest {
 
     @Test
     public void testConvertWithNullTargetCurrency() {
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find target currency in arguments");
+        //IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find target currency in arguments");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> currencyConvertor.convert(USD, null, BigDecimal.ONE))
@@ -56,7 +56,7 @@ public class CurrencyConvertorImplTest {
 
     @Test
     public void testConvertWithNullSourceAmount() {
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source Amount in arguments");
+        //IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source Amount in arguments");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> currencyConvertor.convert(USD, INR, null))
@@ -81,7 +81,8 @@ public class CurrencyConvertorImplTest {
 
         assertThatExceptionOfType(UnknownExchangeRateException.class)
                 .isThrownBy(() -> currencyConvertor.convert(USD, INR, BigDecimal.ONE))
-                .withMessage("Exchange rate table is unknown");
+                .withMessage("Exchange rate table is unknown")
+                .withCause(externalServiceFailureException);
 
 
     }

@@ -38,7 +38,7 @@ public class CurrencyConvertorImpl implements CurrencyConvertor {
 
             retval = sourceAmount.multiply(exchangeRate).setScale(2, RoundingMode.HALF_EVEN);
         } catch (ExternalServiceFailureException e) {
-            throw new UnknownExchangeRateException("Exchange rate table is unknown");
+            throw new UnknownExchangeRateException("Exchange rate table is unknown", e);
         }
         return retval;
     }
