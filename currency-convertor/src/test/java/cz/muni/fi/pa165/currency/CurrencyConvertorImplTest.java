@@ -1,81 +1,89 @@
 package cz.muni.fi.pa165.currency;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.internal.matchers.Null;
+
 import java.math.BigDecimal;
 import java.util.Currency;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
+
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
-@RunWith(MockitoJUnitRunner.class)
 public class CurrencyConvertorImplTest {
 
-    private static Currency CZK = Currency.getInstance("CZK");
-    private static Currency EUR = Currency.getInstance("EUR");
+    private static final Currency USD = Currency.getInstance("USD");
+    private static final Currency INR = Currency.getInstance("INR");
 
-    @Mock
-    private ExchangeRateTable exchangeRateTable;
 
-    private CurrencyConvertor currencyConvertor;
+    private final ExchangeRateTable exchangeRateTable = mock(ExchangeRateTable.class);
+    private final CurrencyConvertor currencyConvertor= new CurrencyConvertorImpl(exchangeRateTable);
 
-    @Before
-    public void init() {
-        currencyConvertor = new CurrencyConvertorImpl(exchangeRateTable);
-    }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testConvert() throws ExternalServiceFailureException {
-        when(exchangeRateTable.getExchangeRate(EUR, CZK))
-                .thenReturn(new BigDecimal("0.1"));
+        // Don't forget to test border values and proper rounding.
+        when(exchangeRateTable.getExchangeRate(USD, INR)).thenReturn(new BigDecimal("73.152"));
 
-        assertEquals(new BigDecimal("1.00"), currencyConvertor.convert(EUR, CZK, new BigDecimal("10.050")));
-        assertEquals(new BigDecimal("1.01"), currencyConvertor.convert(EUR, CZK, new BigDecimal("10.051")));
-        assertEquals(new BigDecimal("1.01"), currencyConvertor.convert(EUR, CZK, new BigDecimal("10.149")));
-        assertEquals(new BigDecimal("1.02"), currencyConvertor.convert(EUR, CZK, new BigDecimal("10.150")));
+        assertThat(currencyConvertor.convert(USD,INR,new BigDecimal("1.50")))
+                .isEqualTo(new BigDecimal("109.73"));
+
     }
 
     @Test
-    public void testConvertWithNullSourceCurrency() {
-        expectedException.expect(IllegalArgumentException.class);
-        currencyConvertor.convert(null, CZK, BigDecimal.ONE);
+    public void testConvertWithNullSourceCurrency() throws IllegalArgumentException,ExternalServiceFailureException{
+
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source currency in arguments");
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> currencyConvertor.convert(null, INR, BigDecimal.ONE))
+                .withMessage("Didnt find source currency in arguments");
+
     }
 
     @Test
     public void testConvertWithNullTargetCurrency() {
-        expectedException.expect(IllegalArgumentException.class);
-        currencyConvertor.convert(EUR, null, BigDecimal.ONE);
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find target currency in arguments");
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> currencyConvertor.convert(USD, null, BigDecimal.ONE))
+                .withMessage("Didnt find target currency in arguments");
+
     }
 
     @Test
     public void testConvertWithNullSourceAmount() {
-        expectedException.expect(IllegalArgumentException.class);
-        currencyConvertor.convert(EUR, CZK, null);
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Didnt find source Amount in arguments");
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> currencyConvertor.convert(USD, INR, null))
+                .withMessage("Didnt find source Amount in arguments");
+
     }
 
     @Test
-    public void testConvertWithUnknownCurrency() throws ExternalServiceFailureException {
-        when(exchangeRateTable.getExchangeRate(EUR, CZK))
-                .thenReturn(null);
-        expectedException.expect(UnknownExchangeRateException.class);
-        currencyConvertor.convert(EUR, CZK, BigDecimal.ONE);
+    public void testConvertWithUnknownCurrency() throws ExternalServiceFailureException{
+        when(exchangeRateTable.getExchangeRate(USD, INR)).thenReturn(null);
 
+        assertThatExceptionOfType(UnknownExchangeRateException.class)
+                .isThrownBy(() -> currencyConvertor.convert(USD, INR, BigDecimal.ONE))
+                .withMessage("The lookup for exchange rate found nothing");
     }
 
     @Test
     public void testConvertWithExternalServiceFailure() throws ExternalServiceFailureException {
-        when(exchangeRateTable.getExchangeRate(EUR, CZK))
-                .thenThrow(UnknownExchangeRateException.class);
-        expectedException.expect(UnknownExchangeRateException.class);
-        currencyConvertor.convert(EUR, CZK, BigDecimal.ONE);
+        ExternalServiceFailureException externalServiceFailureException = new ExternalServiceFailureException("external error");
+
+        when(exchangeRateTable.getExchangeRate(USD, INR)).thenThrow(externalServiceFailureException);
+
+        assertThatExceptionOfType(UnknownExchangeRateException.class)
+                .isThrownBy(() -> currencyConvertor.convert(USD, INR, BigDecimal.ONE))
+                .withMessage("Exchange rate table is unknown");
+
+
     }
 
 }
