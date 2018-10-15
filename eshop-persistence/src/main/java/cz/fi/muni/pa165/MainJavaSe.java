@@ -1,16 +1,19 @@
 package cz.fi.muni.pa165;
 
-import java.sql.SQLException;
-import java.util.List;
+import cz.fi.muni.pa165.entity.Category;
+import cz.fi.muni.pa165.entity.Product;
+import cz.fi.muni.pa165.enums.Color;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import cz.fi.muni.pa165.entity.Category;
-import cz.fi.muni.pa165.entity.Product;
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 public class MainJavaSe {
 	private static EntityManagerFactory emf;
@@ -22,7 +25,7 @@ public class MainJavaSe {
 		emf = Persistence.createEntityManagerFactory("default");
 		try {
 			// BEGIN YOUR CODE
-			task04();
+			task06();
 			// END YOUR CODE
 		} finally {
 			emf.close();
@@ -36,6 +39,28 @@ public class MainJavaSe {
 		// You must first obtain the Entity manager
 		// Then you have to start transaction using getTransaction().begin()
 		// Then use persist() to persist both of the categories and finally commit the transaction
+
+
+
+		EntityManager entityManager = emf.createEntityManager();
+
+		try {
+			entityManager.getTransaction().begin();
+
+			Category category1 = new Category();
+			Category category2 = new Category();
+			category1.setName("Electronics");
+			category2.setName("Musical");
+
+			entityManager.persist(category1);
+			entityManager.persist(category2);
+
+			entityManager.getTransaction().commit();
+
+		}finally {
+			entityManager.close();
+		}
+
 
 		// The code below is just testing code. Do not modify it
 		EntityManager em = emf.createEntityManager();
@@ -69,6 +94,18 @@ public class MainJavaSe {
 		// the detached category
 		// into the context and change the name to "Electro"
 
+		EntityManager em2 = emf.createEntityManager();
+		try {
+			em2.getTransaction().begin();
+			Category found = em2.find(Category.class, 1l);
+			found.setName("Electro");
+			em2.getTransaction().commit();
+		} finally {
+			em2.close();
+		}
+
+
+
 
 		// The code below is just testing code. Do not modify it
 		EntityManager checkingEm = emf.createEntityManager();
@@ -95,6 +132,22 @@ public class MainJavaSe {
 		//
 		// To test your code uncomment the commented code at the end of this method.
 
+		EntityManager em3 = emf.createEntityManager();
+
+		try{
+			em3.getTransaction().begin();
+			Product product = new Product();
+			product.setName("Guitar");
+			product.setColor(Color.BLACK);
+			Calendar calendar =new GregorianCalendar(2011,1,20);
+
+			product.setDate(calendar.getTime());
+			em3.persist(product);
+			em3.getTransaction().commit();
+		}finally {
+			em3.close();
+		}
+
 
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
@@ -103,7 +156,7 @@ public class MainJavaSe {
 		em.getTransaction().commit();
 		em.close();
 
-	/** TODO Uncomment the following test code after you are finished!
+	// TODO Uncomment the following test code after you are finished!
 	 
 		assertEq(p.getName(), "Guitar");
 		Calendar cal = Calendar.getInstance();
@@ -137,7 +190,7 @@ public class MainJavaSe {
 	
 
 		System.out.println("Task6 ok!");
-		*/
+
 	}
 	
 	private static void task08() {

@@ -12,6 +12,8 @@
 			<property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />
 			<property name="hibernate.hbm2ddl.auto" value="create" />
+			<property name="hibernate.hbm2ddl.show_sql" value="create" />
+			<property name="hibernate.hbm2ddl.format_sql" value="create" />
 		</properties>
 	</persistence-unit>
 
