@@ -23,6 +23,9 @@ public class Category {
 	@NotNull
 	@Column(nullable=false,unique=true)
 	private String name;
+
+	@ManyToMany()
+	private Set<Product> products;
 	
 
 	//TODO after you are done with task02 you can uncomment this methods

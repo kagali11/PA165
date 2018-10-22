@@ -12,9 +12,12 @@ import org.testng.annotations.Test;
 import cz.fi.muni.pa165.PersistenceSampleApplicationContext;
 import cz.fi.muni.pa165.entity.Category;
 
+import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static org.testng.Assert.assertEquals;
 
 
-public class Task01  {
+@ContextConfiguration(classes = PersistenceSampleApplicationContext.class)
+public class Task01 extends AbstractTestNGSpringContextTests{
 
 	
 	@PersistenceUnit
@@ -30,6 +33,13 @@ public class Task01  {
 		em.getTransaction().commit();
 		em.close();
 		//TODO under this line: create a second entity manager in categoryTest, use find method to find the category and assert its name.
+
+		EntityManager em2 = emf.createEntityManager();
+		Category temp = em2.find(Category.class, cat.getId());
+		assertEquals(temp.getName(), "Test");
+		em2.close();
+
+
 	}
 
 }

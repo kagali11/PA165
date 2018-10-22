@@ -33,7 +33,9 @@ public class Product {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
+
+	@ManyToMany(mappedBy="Category")
+ 	private Set<Category> categories;
 
 	@Lob
 	private byte[] image;
@@ -74,7 +76,7 @@ public class Product {
 	 * with TASK 02 you should delete this empty method
 	 * @param kitchen
 	 */
-	public void addCategory(Category kitchen) {	
+	public void addCategory(Category kitchen) {
 	}
 	public List<Product> getCategories() {
 		return null;
